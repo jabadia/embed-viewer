@@ -1,0 +1,262 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.10/js/dojo/dijit/themes/dijit.css">
+    <link rel="stylesheet" type="text/css" href="//js.arcgis.com/3.10/js/esri/css/esri.css">
+     <style>
+      .esriMobilePopupInfoView {
+        overflow: auto;
+      }
+      body .esriAttribution {
+        font-size: 10px;
+        font-family:  Verdana,Helvetica,sans-serif;
+      }
+      .HomeButton {
+        border-bottom: 1px solid #57585A;
+        width: 30px;
+        height: 30px;
+      }
+      .HomeButton .home {
+        background: url("./img/home_locate.png") no-repeat 0 0;
+        width: 30px;
+        height: 30px;
+      }
+      .HomeButton .home:hover {
+        background-color: #eee;
+        width: 30px;
+        height: 30px;
+        padding: 0px;
+        border-radius: 0;
+      }
+    </style>
+    <script type="text/javascript" src="./js/config.js">
+    </script>    
+    <script type="text/javascript">
+        var dojoConfig = {
+          parseOnLoad:true,
+          isDebug: false,
+          packages: [
+              {
+                name: "embedViewer",
+                location: location.pathname.replace(/\/[^/]+$/, '/./js') 
+              }
+          ]
+        };
+   </script>
+    <script src="//js.arcgis.com/3.10compact"></script>
+    <script type="text/javascript">
+      dojo.require("esri.map");
+			dojo.require("esri.dijit.Attribution");
+      dojo.require("esri.IdentityManager");
+      dojo.require("esri.dijit.Scalebar");
+      dojo.require("esri.dijit.HomeButton");
+      dojo.require("esri.arcgis.utils");
+      dojo.requireLocalization("embedViewer","resources");
+
+      dojo.addOnLoad(init);
+      
+      var map;
+      var scalebar;
+      var timer;
+			var i18n;
+
+      //Patch for shape query on old servers.  Remove at jsapi 3.5.
+      function removeShapeField(ioArgs) {
+        if (/\/query$/i.test(ioArgs.url) && ioArgs.content && ioArgs.content.outFields) {
+          ioArgs.content.outFields = ioArgs.content.outFields.replace(/,shape,/gi, ",");  
+          ioArgs.content.outFields = ioArgs.content.outFields.replace(/^shape,|,shape$/i, "");
+        }
+        return ioArgs;
+      }
+      //Patch for shape query on old servers.  Remove at jsapi 3.5.
+      
+      function init(){
+        //Patch for shape query on old servers.  Remove at jsapi 3.5.
+        esri.setRequestPreCallback(removeShapeField);
+        //Patch for shape query on old servers.  Remove at jsapi 3.5.
+
+        dojo.require("esri.dijit.PopupMobile");
+        
+        // so we don't have to reload with https when we prompt the user to login
+		    esri.config.defaults.io.corsEnabledServers.push('http://' + location.host);
+		    esri.config.defaults.io.corsEnabledServers.push('https://' + location.host);
+        // for not CORS enabled servers
+        esri.id.setProtocolErrorHandler(function(obj) {
+          window.location = window.location.href.replace("http://","https://");
+          return false;
+        });
+				// don't forward to the arcgis.com sign in page
+	      esri.id._doPortalSignIn = function() {
+	        return false;
+	      }
+
+        i18n = dojo.i18n.getLocalization("embedViewer", "resources").embedViewer;
+        
+        esri.arcgis.utils.arcgisUrl = esriGeowConfig.restBaseUrl + "content/items";
+        esri.config.defaults.io.proxyUrl = esriGeowConfig.proxyServer;
+
+        var defaultGeometryServerUrl = document.location.protocol + "//utility.arcgisonline.com/arcgis/rest/services/Geometry/GeometryServer";
+        esri.config.defaults.geometryService = new esri.tasks.GeometryService(defaultGeometryServerUrl);
+        esri.request({
+          url: esriGeowConfig.restBaseUrl + "portals/self",
+          content: {"f": "json"},
+          callbackParamName:"callback",
+          load: function(result, args){
+            var hs = result.helperServices;
+            if (hs && hs.geometry && hs.geometry.url && hs.geometry.url !== defaultGeometryServerUrl) {
+              esri.config.defaults.geometryService = new esri.tasks.GeometryService(hs.geometry.url);
+            }
+          }
+        });
+
+        var hrefObject = esri.urlToObject(document.location.href);
+        if (!hrefObject.query) {
+          console.log("No Web Map id provided.");
+          displayError();
+          return;
+        }
+        
+        var itemId = hrefObject.query.webmap;
+        if (!itemId) {
+          console.log("No Web Map id provided.");
+          displayError();
+          return;
+        }
+        
+        timer = setTimeout(function(){
+          if (!map) {
+            displayError();
+          }
+        }, 10000);
+        
+        // minx,miny,maxx,maxy
+        var extent = hrefObject.query.extent;
+        if (extent) {
+          var extArray = extent.split(",");
+          if (dojo.some(extArray, function(value){
+            return isNaN(value);
+          })) {
+            getItem(itemId);
+          } else {
+            if (extArray.length == 4) {
+              getItem(itemId, extArray);
+            } else {
+              getItem(itemId);
+            }
+          }
+        } else {
+          getItem(itemId);
+        }
+      }
+      
+      function getItem(item, extArray){
+      
+        var deferred = esri.arcgis.utils.getItem(item);
+        
+        deferred.addCallback(function(itemInfo){
+          if (extArray) {
+            itemInfo.item.extent = [[parseFloat(extArray[0]), parseFloat(extArray[1])], [parseFloat(extArray[2]), parseFloat(extArray[3])]];
+          }
+          createMap(itemInfo);
+        });
+        
+        deferred.addErrback(function(error){
+          clearTimeout(timer);
+          displayError(error);
+          console.log("CreateMap failed: ", dojo.toJson(error));
+        });
+      }
+      
+      function createMap(item){
+      
+        var hrefObject = esri.urlToObject(document.location.href);
+        var bing = hrefObject.query.bing;
+        var zoom = hrefObject.query.zoom;
+        var scale = hrefObject.query.scale;
+        var home = hrefObject.query.home;
+        
+        var deferred = esri.arcgis.utils.createMap(item, "map", {
+          mapOptions: {
+            slider: (zoom == "true" || home == "true") ? true : false,
+            nav: false,
+            wrapAround180: true,
+            showAttribution: true
+          },
+          usePopupManager: true,
+          bingMapsKey: (bing == "true") ? esriGeowConfig.bingMapsKey : null
+        });
+        
+        deferred.addCallback(function(response){
+          map = response.map;
+          
+          if (scale) {
+            scalebar = new esri.dijit.Scalebar({
+              map: map,
+              scalebarUnit: "dual"
+            });
+          }
+          
+          if (home) {
+            var homeButton = new esri.dijit.HomeButton({
+              map: map,
+              extent: map.extent 
+            }, dojo.create("div", {}, dojo.query(".esriSimpleSliderIncrementButton")[0], "after"));
+            homeButton.startup();
+          }
+
+          adjustPopupSize(map);
+        });
+        
+        deferred.addErrback(function(error){
+          clearTimeout(timer);
+          displayError(error);
+          console.log("CreateMap failed: ", dojo.toJson(error));
+        });
+
+      }
+
+      function adjustPopupSize(map) {
+        var box = dojo.contentBox(map.container);        
+        
+        var width = 270, height = 300, // defaults
+            newWidth = Math.round(box.w * 0.60),             
+						newHeight = Math.round(box.h * 0.45);        
+        if (newWidth < width) {
+          width = newWidth;
+        }
+        
+        if (newHeight < height) {
+          height = newHeight;
+        }
+        
+        map.infoWindow.resize(width, height);
+      }
+  
+      function displayError(error){
+        console.log((error && error.message) ? error.message : error);
+        if (error && error.message && error.message.indexOf("You are currently") > -1 && error.message.indexOf("You do not have access") > -1) {
+          // new Error("You are currently signed in as: '<username>'. You do not have access to this resource: <url>");
+          dojo.byId("error").innerHTML = "<div style='height:50%;padding-top:25%;'><center>"+i18n.noAccess+"</center></div>";
+        } else {
+          dojo.byId("error").innerHTML = "<div style='height:50%;padding-top:25%;'><center>"+i18n.mapNotAvailable+"</center></div>";
+        }
+      }
+    </script>
+    <style type="text/css">
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0px;
+        padding: 0px;
+      }
+    </style>
+  </head>
+  <body class="tundra">
+    <div id="error" style="position:absolute; width:100%; height:100%;">
+    </div>
+    <div id="map" style="width:100%; height:100%;">
+    </div>
+  </body>
+</html>
