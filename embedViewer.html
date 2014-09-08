@@ -53,6 +53,7 @@
       dojo.require("esri.dijit.Scalebar");
       dojo.require("esri.dijit.HomeButton");
       dojo.require("esri.arcgis.utils");
+      dojo.require("esri.tasks.query");
       dojo.requireLocalization("embedViewer","resources");
 
       dojo.addOnLoad(init);
@@ -150,6 +151,35 @@
           console.log("CreateMap failed: ", dojo.toJson(error));
         });
       }
+
+      function getLayerByTitle(response,layerId)
+      {
+        console.log("itemData", response.itemInfo.itemData);
+        console.log("layerId", layerId);
+
+        var layers = dojo.filter(response.itemInfo.itemData.operationalLayers, function(layerInfo)
+        {
+          return layerInfo.title == layerId;
+        });
+
+        if( layers.length == 1)
+        {
+          if( layers[0].layerObject )
+          {            
+            return layers[0].layerObject;
+          }
+          else
+          {
+            /* es una capa gráfica? */
+            displayMessage("Can't select feature in this layer type: " + layers[0].id)
+          }
+        }
+        else
+        {
+          displayMessage("Can't find layer " + layerId);
+          return 0;          
+        }
+      }
       
       function createMap(item){
       
@@ -160,7 +190,9 @@
         var home = hrefObject.query.home;
 
         var layerId = hrefObject.query.layerId;
+        var fieldId = hrefObject.query.fieldId;
         var featureId = hrefObject.query.featureId;
+        var showPopup = (hrefObject.query.showPopup == "true") ? true : false;
 
         console.log("initial selection: ", layerId,featureId);
         
@@ -175,25 +207,70 @@
           bingMapsKey: (bing == "true") ? esriGeowConfig.bingMapsKey : null
         });
         
-        deferred.addCallback(function(response){
-          map = response.map;
-          
-          if (scale) {
-            scalebar = new esri.dijit.Scalebar({
-              map: map,
-              scalebarUnit: "dual"
-            });
-          }
-          
-          if (home) {
-            var homeButton = new esri.dijit.HomeButton({
-              map: map,
-              extent: map.extent 
-            }, dojo.create("div", {}, dojo.query(".esriSimpleSliderIncrementButton")[0], "after"));
-            homeButton.startup();
-          }
+        deferred.addCallback(function(response)
+        {
+          try
+          {
+            map = response.map;
+            
+            if (scale) {
+              scalebar = new esri.dijit.Scalebar({
+                map: map,
+                scalebarUnit: "dual"
+              });
+            }
+            
+            if (home) {
+              var homeButton = new esri.dijit.HomeButton({
+                map: map,
+                extent: map.extent 
+              }, dojo.create("div", {}, dojo.query(".esriSimpleSliderIncrementButton")[0], "after"));
+              homeButton.startup();
+            }
 
-          adjustPopupSize(map);
+            if( layerId && featureId )
+            {
+              var layer = getLayerByTitle(response, layerId)
+              if( layer && layer.queryFeatures != undefined)
+              {
+                var query = new esri.tasks.Query();
+                fieldId = fieldId || layer.objectIdField;
+                query.where = fieldId + "=" + featureId;
+                layer.queryFeatures(query,
+                  function(result)
+                  {
+                    var selected = result.features;
+                    console.log("selected:",selected);
+                    if( selected.length == 0)
+                    {
+                      displayError("Can't find feature " + featureId);
+                      return;
+                    }
+                    var extent = esri.graphicsExtent(selected);
+                    console.log(extent);
+                    map.setExtent(extent).then(function()
+                    {
+                      map.infoWindow.setFeatures(selected);
+                      if( showPopup )
+                      {                      
+                        map.infoWindow.show(selected[0].geometry);
+                      }                      
+                    });
+                  });
+              }
+              else
+              {
+                console.log("EERROORR!!!");
+              }
+            }
+
+            adjustPopupSize(map);
+          }
+          catch(error)
+          {
+            console.log("ERROR IN CREATEMAP CALLBACK", error);
+            debugger;
+          }
         });
         
         deferred.addErrback(function(error){
@@ -229,6 +306,11 @@
         } else {
           dojo.byId("error").innerHTML = "<div style='height:50%;padding-top:25%;'><center>"+i18n.mapNotAvailable+"</center></div>";
         }
+      }
+
+      function displayMessage(message)
+      {
+        alert(message);
       }
     </script>
     <style type="text/css">
