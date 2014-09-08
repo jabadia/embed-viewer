@@ -16,15 +16,17 @@
 		.mapContainer h3 {
 			padding-left: 10px;
 		}
+		.separator {
+			clear:both;
+		}
 	</style>
 </head>
 <body>
 	<h1>Test</h1>
+
+<!--	-->
 	<div class="mapContainer">
 		<h3>Mapa con webmapid y extent</h3>
-		<!--
-		src="http://javierabadia.maps.arcgis.com/home/webmap/embedViewer.html?webmap=0362fc3cd0eb48d7930e5e6525baf0bb&amp;extent=-117.0099,34.1724,-116.8417,34.2894"
-		-->
 		<iframe width="500" height="250" 
 			frameborder="0" scrolling="no" 
 			marginheight="0" marginwidth="0" 
@@ -39,13 +41,21 @@
 	</div>
 	<div class="mapContainer">
 		<h3>Mapa sin webmapid</h3>
-		<!--
-		src="http://javierabadia.maps.arcgis.com/home/webmap/embedViewer.html?webmap=0362fc3cd0eb48d7930e5e6525baf0bb&amp;extent=-117.0099,34.1724,-116.8417,34.2894"
-		-->
 		<iframe width="500" height="250" 
 			frameborder="0" scrolling="no" 
 			marginheight="0" marginwidth="0" 
 			src="../embedViewer.html">
+		</iframe>
+	</div>
+
+	<div class="separator"></div>
+<!-- -->
+	<div class="mapContainer">
+		<h3>Mapa con webmapid y feature id</h3>
+		<iframe width="500" height="250" 
+			frameborder="0" scrolling="no" 
+			marginheight="0" marginwidth="0" 
+			src="../embedViewer.html?webmap=6e5721d80f3340d08e7ec24a798e6639&amp;layerId=Fuentes&amp;featureId=2">
 		</iframe>
 	</div>
 </body>
