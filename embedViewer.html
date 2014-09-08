@@ -47,6 +47,9 @@
    </script>
     <script src="//js.arcgis.com/3.10compact"></script>
     <script type="text/javascript">
+
+    /*https://developers.arcgis.com/javascript/jssamples/query_showinfowindow.html*/
+
       dojo.require("esri.map");
 			dojo.require("esri.dijit.Attribution");
       dojo.require("esri.IdentityManager");
@@ -157,16 +160,32 @@
         console.log("itemData", response.itemInfo.itemData);
         console.log("layerId", layerId);
 
-        var layers = dojo.filter(response.itemInfo.itemData.operationalLayers, function(layerInfo)
+        var layers = [];
+        dojo.forEach(response.itemInfo.itemData.operationalLayers, function(layer)
         {
-          return layerInfo.title == layerId;
+          if(layer.layerType == "ArcGISMapServiceLayer")
+          {
+            console.log(layer);
+            dojo.forEach(layer.layerObject.layerInfos, function(layerInfo)
+            {
+              if(layerInfo.name == layerId)
+                layers.push({url: layer.url + "/" + layerInfo.id}); 
+            });
+          }
+        });
+
+
+        dojo.forEach(response.itemInfo.itemData.operationalLayers, function(layerInfo)
+        {
+          if(layerInfo.title == layerId)
+            layers.push({url:layerInfo.url, objectIdField: layerInfo.layerObject.objectIdField });
         });
 
         if( layers.length == 1)
         {
-          if( layers[0].layerObject )
+          if( layers[0].url )
           {            
-            return layers[0].layerObject;
+            return layers[0];
           }
           else
           {
@@ -230,13 +249,18 @@
 
             if( layerId && featureId )
             {
-              var layer = getLayerByTitle(response, layerId)
-              if( layer && layer.queryFeatures != undefined)
+              var layer = getLayerByTitle(response, layerId);
+
+              if( layer )
               {
                 var query = new esri.tasks.Query();
                 fieldId = fieldId || layer.objectIdField;
                 query.where = fieldId + "=" + featureId;
-                layer.queryFeatures(query,
+                query.returnGeometry = true;
+                query.outFields = ["*"];
+                query.outSpatialReference = map.spatialReference;
+                var task = new esri.tasks.QueryTask(layer.url);
+                task.execute(query,
                   function(result)
                   {
                     var selected = result.features;
@@ -247,8 +271,11 @@
                       return;
                     }
                     var extent = esri.graphicsExtent(selected);
-                    console.log(extent);
-                    map.setExtent(extent).then(function()
+                    console.log("EXTENT:",extent, extent.getHeight(), extent.getWidth());
+                    extent.expand(1.2);
+                    if( extent.getHeight() == 0) { extent.ymin -= 250; extent.ymax += 250; }
+                    if( extent.getWidth()  == 0) { extent.xmin -= 250; extent.xmax += 250; }
+                    map.setExtent(extent,true).then(function()
                     {
                       map.infoWindow.setFeatures(selected);
                       if( showPopup )
