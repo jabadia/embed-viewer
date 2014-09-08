@@ -61,21 +61,8 @@
       var scalebar;
       var timer;
 			var i18n;
-
-      //Patch for shape query on old servers.  Remove at jsapi 3.5.
-      function removeShapeField(ioArgs) {
-        if (/\/query$/i.test(ioArgs.url) && ioArgs.content && ioArgs.content.outFields) {
-          ioArgs.content.outFields = ioArgs.content.outFields.replace(/,shape,/gi, ",");  
-          ioArgs.content.outFields = ioArgs.content.outFields.replace(/^shape,|,shape$/i, "");
-        }
-        return ioArgs;
-      }
-      //Patch for shape query on old servers.  Remove at jsapi 3.5.
-      
+        
       function init(){
-        //Patch for shape query on old servers.  Remove at jsapi 3.5.
-        esri.setRequestPreCallback(removeShapeField);
-        //Patch for shape query on old servers.  Remove at jsapi 3.5.
 
         dojo.require("esri.dijit.PopupMobile");
         
