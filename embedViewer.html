@@ -101,20 +101,25 @@
         var hrefObject = esri.urlToObject(document.location.href);
         if (!hrefObject.query) {
           console.log("No Web Map id provided.");
-          displayError();
+          displayError("No Web Map id provided. --");
           return;
         }
         
         var itemId = hrefObject.query.webmap;
         if (!itemId) {
           console.log("No Web Map id provided.");
-          displayError();
+          displayError("No Web Map id provided. ---");
           return;
         }
+
+        var createMapOptions = {}
+
+        createMapOptions.layerId = hrefObject.query.layerId;
+        createMapOptions.featureId = hrefObject.query.featureId;
         
         timer = setTimeout(function(){
           if (!map) {
-            displayError();
+            displayError("Timeout");
           }
         }, 10000);
         
@@ -122,29 +127,22 @@
         var extent = hrefObject.query.extent;
         if (extent) {
           var extArray = extent.split(",");
-          if (dojo.some(extArray, function(value){
-            return isNaN(value);
-          })) {
-            getItem(itemId);
-          } else {
-            if (extArray.length == 4) {
-              getItem(itemId, extArray);
-            } else {
-              getItem(itemId);
-            }
+          if (extArray.length == 4 && dojo.every(extArray, function(value){ return !isNaN(value); }))
+          {
+              createMapOptions.extArray = extArray;
           }
-        } else {
-          getItem(itemId);
         }
-      }
+          getItem(itemId, createMapOptions);
+      } // end of init()
       
-      function getItem(item, extArray){
+      function getItem(item, options){
       
+        console.log("item,options:",item, options);
         var deferred = esri.arcgis.utils.getItem(item);
         
         deferred.addCallback(function(itemInfo){
-          if (extArray) {
-            itemInfo.item.extent = [[parseFloat(extArray[0]), parseFloat(extArray[1])], [parseFloat(extArray[2]), parseFloat(extArray[3])]];
+          if (options.extArray) {
+            itemInfo.item.extent = [[parseFloat(options.extArray[0]), parseFloat(options.extArray[1])], [parseFloat(options.extArray[2]), parseFloat(options.extArray[3])]];
           }
           createMap(itemInfo);
         });
