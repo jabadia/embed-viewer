@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Test change-id</title>
+	<style>
+		* {
+			font-family: Arial;
+		}
+		#test-container {
+			margin: 20px 20px;
+		}
+		.map-container {
+			width: 600px;
+			background: #ccc;
+			margin: 20px 0px;
+		}
+		.map-container h3 {
+			padding-left: 10px;
+		}
+	</style>
+</head>
+<body>
+	<h1>Test change-id</h1>
+	<div id="test-container">
+		<div class="map-container">
+			<h3>Mapa con featureId, puntos</h3>
+			<iframe id="map-frame"
+				width="600" height="300" 
+				frameborder="0" scrolling="no" 
+				marginheight="0" marginwidth="0" 
+				src="../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=Locales&amp;fieldId=id_local&amp;featureId=280048981">
+			</iframe>
+		</div>		
+		<button id="change-id">Cambiar Local</button>
+		<span id="current-id">280048981</span><br>
+		<input type="checkbox" id="show-popup"/><label for="show-popup">Ver pop-up</label>
+	</div>
+
+	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script>
+		
+		$(function()
+		{
+			var locales = [ 
+				'280048981',
+				'80000870',
+				'285015927',
+				'270509347',
+				'280023800'
+			];
+			var currentIdx = 0;
+
+			$('#change-id').click(function()
+			{
+				currentIdx = (currentIdx + 1) % locales.length;
+				$('#current-id').text(locales[currentIdx]);
+				var showPopup = $('#show-popup').prop('checked');
+				$('#map-frame')[0].contentWindow.postMessage('change-id:Locales:id_local:' + locales[currentIdx] + ":" + (showPopup? "1":"0"), '*');
+			});
+		});
+
+	</script>
+</body>
+</html>
+

@@ -65,6 +65,7 @@
       var scalebar;
       var timer;
 			var i18n;
+      var g_response;
         
       function init(){
 
@@ -121,6 +122,17 @@
             displayError("Timeout");
           }
         }, 10000);
+
+        dojo.connect(window,'message',function(evt)
+        {
+          console.log('received msg: ' + evt.data);
+          var components = evt.data.split(':');
+          var layerId = components[1];
+          var fieldId = components[2];
+          var featureId = components[3];
+          var showPopup = (components.length > 4)? parseInt(components[4]) : false;
+          selectFeature(layerId,fieldId,featureId,showPopup);
+        })
         
         // minx,miny,maxx,maxy
         var extent = hrefObject.query.extent;
@@ -136,6 +148,50 @@
         }
           
       } // end of init()
+
+      function selectFeature(layerId,fieldId,featureId,showPopup)
+      {
+              var layer = getLayerByTitle(g_response, layerId);
+
+              if( layer )
+              {
+                var query = new esri.tasks.Query();
+                fieldId = fieldId || layer.objectIdField;
+                query.where = fieldId + "=" + featureId;
+                query.returnGeometry = true;
+                query.outFields = ["*"];
+                query.outSpatialReference = map.spatialReference;
+                var task = new esri.tasks.QueryTask(layer.url);
+                task.execute(query,
+                  function(result)
+                  {
+                    var selected = result.features;
+                    console.log("selected:",selected);
+                    if( selected.length == 0)
+                    {
+                      displayError("Can't find feature " + featureId);
+                      return;
+                    }
+                    var extent = esri.graphicsExtent(selected);
+                    console.log("EXTENT:",extent, extent.getHeight(), extent.getWidth());
+                    extent.expand(1.2);
+                    if( extent.getHeight() == 0) { extent.ymin -= 250; extent.ymax += 250; }
+                    if( extent.getWidth()  == 0) { extent.xmin -= 250; extent.xmax += 250; }
+                    map.setExtent(extent,true).then(function()
+                    {
+                      map.infoWindow.setFeatures(selected);
+                      if( showPopup )
+                      {                      
+                        map.infoWindow.show(selected[0].geometry);
+                      }                      
+                    });
+                  });
+              }
+              else
+              {
+                console.log("EERROORR!!!");
+              }
+      }
       
       function getItem(item, extArray){
       
@@ -230,6 +286,7 @@
         {
           try
           {
+            g_response = response;
             map = response.map;
             
             if (scale) {
@@ -249,46 +306,7 @@
 
             if( layerId && featureId )
             {
-              var layer = getLayerByTitle(response, layerId);
-
-              if( layer )
-              {
-                var query = new esri.tasks.Query();
-                fieldId = fieldId || layer.objectIdField;
-                query.where = fieldId + "=" + featureId;
-                query.returnGeometry = true;
-                query.outFields = ["*"];
-                query.outSpatialReference = map.spatialReference;
-                var task = new esri.tasks.QueryTask(layer.url);
-                task.execute(query,
-                  function(result)
-                  {
-                    var selected = result.features;
-                    console.log("selected:",selected);
-                    if( selected.length == 0)
-                    {
-                      displayError("Can't find feature " + featureId);
-                      return;
-                    }
-                    var extent = esri.graphicsExtent(selected);
-                    console.log("EXTENT:",extent, extent.getHeight(), extent.getWidth());
-                    extent.expand(1.2);
-                    if( extent.getHeight() == 0) { extent.ymin -= 250; extent.ymax += 250; }
-                    if( extent.getWidth()  == 0) { extent.xmin -= 250; extent.xmax += 250; }
-                    map.setExtent(extent,true).then(function()
-                    {
-                      map.infoWindow.setFeatures(selected);
-                      if( showPopup )
-                      {                      
-                        map.infoWindow.show(selected[0].geometry);
-                      }                      
-                    });
-                  });
-              }
-              else
-              {
-                console.log("EERROORR!!!");
-              }
+              selectFeature(layerId,fieldId,featureId,showPopup);
             }
 
             adjustPopupSize(map);
