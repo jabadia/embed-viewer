@@ -7,13 +7,13 @@
 		* {
 			font-family: Arial;
 		}
-		.mapContainer {
+		.map-container {
 			width: 500px;
 			margin: 20px 20px;	
 			background: #ccc;
 			float:left;	
 		}
-		.mapContainer h3 {
+		.map-container h3 {
 			padding-left: 10px;
 		}
 		.separator {
@@ -23,91 +23,48 @@
 </head>
 <body>
 	<h1>Test</h1>
+	<div id="test-container"></div>
 
-<!--	-->
-	<div class="mapContainer">
-		<h3>Mapa con webmapid y extent</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html?webmap=5e2b128f81e14643a73d977f22016b67&amp;extent=-6.70,43.52,-6.66,43.56">
-		</iframe><br />
-		<small>
-			<a href="http://javierabadia.maps.arcgis.com/home/webmap/viewer.html?webmap=5e2b128f81e14643a73d977f22016b67&amp;extent=-6.7445,43.5237,-6.6603,43.575" 
-				style="color:#0000FF;text-align:left" 
-				target="_blank">Ver mapa más grande</a>
-		</small>
+	<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+	<script>
 
-	</div>
-	<div class="mapContainer">
-		<h3>Mapa sin webmapid</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html">
-		</iframe>
-	</div>
+		var tests = [
+{title: "Mapa con Extent", url:"../embedViewer.html?webmap=5e2b128f81e14643a73d977f22016b67&amp;extent=-6.70,43.52,-6.66,43.56"},
+{title: "Mapa sin párametros", url:"../embedViewer.html"},
+{title: "Mapa con layerId y featureId, puntos", url:"../embedViewer.html?webmap=6e5721d80f3340d08e7ec24a798e6639&amp;layerId=Fuentes&amp;featureId=2"},
+{title: "Mapa con featureId, lineas", url:"../embedViewer.html?webmap=0362fc3cd0eb48d7930e5e6525baf0bb&amp;layerId=SouthShoreTrails&amp;featureId=2"},
+{title: "Mapa con featureId, puntos", url:"../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=Locales&amp;fieldId=id_local&amp;featureId=280048981"},
+{title: "Mapa con featureId, polígonos", url:"../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=Barrios&amp;fieldId=CODBAR&amp;featureId=087"},
+{title: "Mapa con capa que no existe", url:"../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=CapaQueNoExiste&amp;fieldId=id_f&amp;featureId=-1"},
+{title: "Mapa con featureId que no existe", url:"../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=Locales&amp;fieldId=id_local&amp;featureId=-1"},
+		]
 
-	<div class="separator"></div>
-<!-- -->
-	<div class="mapContainer">
-		<h3>Mapa con webmapid y feature id, punto</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html?webmap=6e5721d80f3340d08e7ec24a798e6639&amp;layerId=Fuentes&amp;featureId=2">
-		</iframe>
-	</div>
+		$(function()
+		{
+			tests.forEach(function(test,i)
+			{
+				var mapblock = $('<div>').addClass('map-container');
+				mapblock.append($('<h3>').append(test.title));
+				mapblock.append($('<iframe>')
+					.attr('width','500')
+					.attr('height','250')
+					.attr('frameborder','0')
+					.attr('scrolling','no')
+					.attr('marginheight','0')
+					.attr('marginwidth','0')
+					.attr('src',test.url)
+				)
+				$('#test-container').append(mapblock);
 
-	<div class="mapContainer">
-		<h3>Mapa con webmapid y feature id, lineas</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html?webmap=0362fc3cd0eb48d7930e5e6525baf0bb&amp;layerId=SouthShoreTrails&amp;featureId=2">
-		</iframe>
-	</div>
+				if( i % 2 == 1)
+				{
+					$('#test-container').append($('<div>').addClass('separator'));
+				}
 
-	<div class="separator"></div>
+			})
+		});
 
-	<div class="mapContainer">
-		<h3>Mapa con webmapid y feature id, censo locales</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=Locales&amp;fieldId=id_local&amp;featureId=280048981">
-		</iframe>
-	</div>
-
-	<div class="mapContainer">
-		<h3>Mapa con webmapid y feature id, barrios</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=Barrios&amp;fieldId=CODBAR&amp;featureId=087">
-		</iframe>
-	</div>
-
-	<div class="separator"></div>
-
-	<div class="mapContainer">
-		<h3>Mapa, no encuentra la capa</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=CapaQueNoExiste&amp;fieldId=id_f&amp;featureId=-1">
-		</iframe>
-	</div>
-
-	<div class="mapContainer">
-		<h3>Mapa, no encuentra la feature</h3>
-		<iframe width="500" height="250" 
-			frameborder="0" scrolling="no" 
-			marginheight="0" marginwidth="0" 
-			src="../embedViewer.html?webmap=bb7dd214060a4d97a1fead003ad1af37&amp;layerId=Locales&amp;fieldId=id_local&amp;featureId=-1">
-		</iframe>
-	</div>
-
-
+	</script>
 </body>
 </html>
+
