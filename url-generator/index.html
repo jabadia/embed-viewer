@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>Configurador de Mapas Embebidos</title>
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" >
+	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css" >
+	<style>
+		body {
+		  padding-top: 50px;
+		}
+
+		body > .container {
+		  padding-bottom: 20px;
+		}
+
+		#map-frame {
+			background: #ccc;
+		}
+		#map-custom-size {
+			display: none;
+		}
+		#map-custom-size input {
+			width: 35%;
+			text-align: center;
+		}
+	</style>
+</head>
+<body>
+	<div class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container">
+			<div class="navbar-header">
+				<button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+					<span class="icon-bar"></span>
+				</button>
+				<a class="navbar-brand" href="#"><i class="fa fa-wrench"></i> Configurador de Mapas Embebidos</a>
+				<a class="navbar-brand" href="#"><i class="fa fa-globe"></i> esri</a>
+			</div>
+		<!--
+		<div class="collapse navbar-collapse">
+		  <ul class="nav navbar-nav">
+			<li class="active"><a href="#">Home</a></li>
+			<li><a href="#about">About</a></li>
+			<li><a href="#contact">Contact</a></li>
+		  </ul>
+		</div>
+	--><!--/.nav-collapse -->
+		</div>
+	</div>
+
+	<div class="container">
+		<div class="row">
+			<div class="col-sm-12">
+				<h3>Mapa: <span id="map-title">[ninguno]</span></h3>
+				<p id="map-description">-</p>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12">
+				<h4>Previsualización</h4>
+				<div id="map-preview" class="well">
+					<iframe id="map-frame"
+						width="600" height="300" 
+						frameborder="0" scrolling="no" 
+						marginheight="0" marginwidth="0" 
+						src=""></iframe>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">			
+			<div class="col-sm-3">
+				<h4>Tamaño (px)</h4>
+				<div class="radio">
+				<input type="radio" name="map-size" id="map-size-small" value="small"><label for="map-size-small"> Pequeño (300x400)</label>
+				</div>
+				<div class="radio">
+				<input type="radio" name="map-size" id="map-size-medium" value="medium"><label for="map-size-medium"> Mediano (500x500)</label>
+				</div>
+				<div class="radio">
+				<input type="radio" name="map-size" id="map-size-large" value="large"><label for="map-size-large"> Grande (800x600)</label>
+				</div>
+				<div class="radio">
+				<input type="radio" name="map-size" id="map-size-custom" value="custom"><label for="map-size-custom"> Personalizado</label>
+				</div>
+				<div id="map-custom-size">
+					<input type="text" name="map-custom-width" id="map-custom-width" placeholder="ancho">
+					x
+					<input type="text" name="map-custom-heigth" id="map-custom-heigth" placeholder="alto">
+				</div>
+			</div>
+			<div class="col-sm-3">
+				<h4>Selección Inicial</h4>
+				Capa
+				Campo
+				Valor
+			</div>
+			<div class="col-sm-3">
+				<h4>Opciones</h4>
+				<div class="checkbox">
+					<label><input type="checkbox"> Abrir pop-up automáticamente</label>
+				</div>					
+				<div class="checkbox">
+					<label><input type="checkbox"> Botón de Inicio</label>
+				</div>					
+				<div class="checkbox">
+					<label><input type="checkbox"> Control de Zoom</label>
+				</div>					
+				<div class="checkbox">
+					<label><input type="checkbox"> Indicador de Escala</label>
+				</div>
+			</div>
+		</div>
+
+		<div class="row">
+			<div class="col-sm-12">				
+				<label for="embed-code">Código HTML: </label><textarea id="embed-code" class="form-control"></textarea>
+				<button type="button" class="btn btn-primary">Copiar</button>
+			</div>
+		</div>
+	</div><!-- container -->
+
+
+	<script src="http://code.jquery.com/jquery-1.10.1.min.js"></script>
+</body>
+</html>
