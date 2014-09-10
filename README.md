@@ -6,3 +6,12 @@
 - identidad!!!
 - api para que el padre pueda seleccionar un elemento distinto		HECHO
 - generar los tests por código										HECHO
+
+## para el generador de urls
+
+- controlar el estado de los controles UI
+- cargar un webmap
+- generar el código del iframe
+- previsualización, refresco
+- obtener la lista de capas y campos de cada capa para que el usuario elija de un desplegable
+- copiar el código al portapapeles
