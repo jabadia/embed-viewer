@@ -10,6 +10,7 @@
 ## para el generador de urls
 
 - controlar el estado de los controles UI
+- mejorar la maquetación (mejor en vertical con el mapa a la derecha?)
 - cargar un webmap
 - generar el código del iframe
 - previsualización, refresco
