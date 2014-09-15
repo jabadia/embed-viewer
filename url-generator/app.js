@@ -38,11 +38,14 @@ $(function()
 	{
 		var viewerUrl = buildViewerUrl(uiState);
 
-		var iframeCode = "<iframe " +
-			"width='" + uiState.width + "' " +
-			"height='" + uiState.height + "' " +
-			"frameborder='0' scrolling='no' marginheight='0' marginwidth='0' " +
-			"src='" + viewerUrl + "'></iframe>";
+		var newLine = '\n';
+		var indent = '    ';
+		var iframeCode = "<iframe " + newLine + 
+			indent + "width='" + uiState.width + "' " +	"height='" + uiState.height + "' " + newLine + 
+			indent + "frameborder='0' scrolling='no'" + newLine + 
+			indent +  "marginheight='0' marginwidth='0' " + newLine + 
+			indent + "src='" + viewerUrl + "'>" + newLine + 
+			"</iframe>";
 
 		return iframeCode;
 	}
@@ -76,7 +79,7 @@ $(function()
 		var uiState = getUIState();
 		var iframeCode = buildIframeCode(uiState);
 
-		$('#embed-code').val(iframeCode);
+		$('#embed-code').text(iframeCode);
 	}
 
 	/* init */
