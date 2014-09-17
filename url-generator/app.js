@@ -159,13 +159,23 @@ $(function()
 
 	/* begin here */
 
-	if(window.location.search)
+	if(window.location.search == "?colera")
+	{
+		$('#webmapid').val("6e5721d80f3340d08e7ec24a798e6639");
+		$('#selected-layer').val("Fuentes");
+		$('#selected-field').val("id");
+		$('#selected-feature').val("1");
+		$('[name=select-feature]').prop('checked',true);
+	}
+	else if(window.location.search)
 	{
 		/* sample data */
 		$('#webmapid').val("bb7dd214060a4d97a1fead003ad1af37");
 		$('#selected-layer').val("Locales");
 		$('#selected-field').val("id_local");
 		$('#selected-feature').val("280048981");
+		$('#select-feature').prop('checked',true);
+		$('[name=select-feature]').prop('checked',true);
 	}
 	initUI();
 });
