@@ -10,6 +10,8 @@ $(function()
 	{
 		var uiState = {};
 
+		uiState.webmapid = $('[name=webmapid]').val();
+
 		var mapSize = $('[name=map-size]:checked').val();
 		switch(mapSize)
 		{
@@ -21,12 +23,25 @@ $(function()
 				uiState.height = parseInt($('#map-custom-height').val());if(isNaN(uiState.height)) uiState.height = 300;
 				break;
 		}
+
+		uiState.layerId   = $('[name=selected-layer').val();
+		uiState.fieldId   = $('[name=selected-field').val();
+		uiState.featureId = $('[name=selected-feature').val();
+
+		uiState.showPopup = $('[name=show-popup-check]').prop('checked');
+		uiState.home = $('[name=home-check]').prop('checked');
+		uiState.zoom = $('[name=zoom-check]').prop('checked');
+		uiState.scale = $('[name=scale-check]').prop('checked');
 		return uiState;
 	}
 
 	function buildViewerUrl(uiState)
 	{
 		var viewerUrl = "../viewer/embedViewer.html?webmap=" + uiState.webmapid +
+			(uiState.home? "&home=true" : "") +
+			(uiState.zoom? "&zoom=true" : "") +
+			(uiState.scale? "&scale=true" : "") +
+			(uiState.showPopup? "&showPopup=true" : "") +
 			"&layerId=" + uiState.layerId +
 			"&fieldId=" + uiState.fieldId +
 			"&featureId=" + uiState.featureId;

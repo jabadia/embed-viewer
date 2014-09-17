@@ -58,7 +58,13 @@
 		<div class="row">
 			<div class="col-sm-12">
 				<h3>Mapa: <span id="map-title">[ninguno]</span></h3>
-				<p id="map-description">-</p>
+				<p id="map-description">-</p><br>
+				<div class="form form-group">
+					<label for="webmapid" class="control-label col-sm-2">Webmap ID:</label>
+					<div class="col-sm-4">
+						<input type="text" name="webmapid" id="webmapid" placeholder="webmap id" class="form-control" value="bb7dd214060a4d97a1fead003ad1af37">
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -98,23 +104,40 @@
 			</div>
 			<div class="col-sm-3">
 				<h4>Selección Inicial</h4>
-				Capa
-				Campo
-				Valor
+				<div class="form-horizontal">
+					<div class="form-group">
+						<label for="selected-layer" class="control-label col-sm-2">Capa</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="selected-layer" id="selected-layer" placeholder="layerId" value="{layerId}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="selected-field" class="control-label col-sm-2">Campo</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="selected-field" id="selected-field" placeholder="fieldId" value="{fieldId}">
+						</div>
+					</div>
+					<div class="form-group">
+						<label for="selected-feature" class="control-label col-sm-2">Valor</label>
+						<div class="col-sm-8">
+							<input type="text" class="form-control" name="selected-feature" id="selected-feature" placeholder="featureId" value="{featureId}">
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="col-sm-3">
 				<h4>Opciones</h4>
 				<div class="checkbox">
-					<label><input type="checkbox"> Abrir pop-up automáticamente</label>
+					<label><input name="show-popup-check" type="checkbox"> Abrir pop-up automáticamente</label>
 				</div>					
 				<div class="checkbox">
-					<label><input type="checkbox"> Botón de Inicio</label>
+					<label><input name="home-check" type="checkbox"> Botón de Inicio</label>
 				</div>					
 				<div class="checkbox">
-					<label><input type="checkbox"> Control de Zoom</label>
+					<label><input name="zoom-check" type="checkbox"> Control de Zoom</label>
 				</div>					
 				<div class="checkbox">
-					<label><input type="checkbox"> Indicador de Escala</label>
+					<label><input name="scale-check" type="checkbox"> Indicador de Escala</label>
 				</div>
 			</div>
 		</div>
