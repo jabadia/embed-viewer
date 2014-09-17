@@ -89,13 +89,13 @@
 			<div class="col-sm-3">
 				<h4>Tamaño (px)</h4>
 				<div class="radio">
-				<input type="radio" name="map-size" id="map-size-small" value="small"><label for="map-size-small"> Pequeño (400x300)</label>
+				<input type="radio" name="map-size" id="map-size-small" value="small"><label for="map-size-small"> Pequeño (300x200)</label>
 				</div>
 				<div class="radio">
-				<input type="radio" name="map-size" id="map-size-medium" value="medium"><label for="map-size-medium"> Mediano (500x500)</label>
+				<input type="radio" name="map-size" id="map-size-medium" value="medium"><label for="map-size-medium"> Mediano (400x300)</label>
 				</div>
 				<div class="radio">
-				<input type="radio" name="map-size" id="map-size-large" value="large"><label for="map-size-large"> Grande (800x600)</label>
+				<input type="radio" name="map-size" id="map-size-large" value="large"><label for="map-size-large"> Grande (600x400)</label>
 				</div>
 				<div class="radio">
 				<input type="radio" name="map-size" id="map-size-custom" value="custom"><label for="map-size-custom"> Personalizado</label>
@@ -109,6 +109,9 @@
 			<div class="col-sm-3">
 				<h4>Selección Inicial</h4>
 				<div class="form-horizontal">
+					<div class="checkbox">
+						<label><input name="select-feature" type="checkbox"> Seleccionar una Entidad</label>
+					</div>					
 					<div class="form-group">
 						<label for="selected-layer" class="control-label col-sm-2">Capa</label>
 						<div class="col-sm-8">
@@ -135,10 +138,10 @@
 					<label><input name="show-popup-check" type="checkbox"> Abrir pop-up automáticamente</label>
 				</div>					
 				<div class="checkbox">
-					<label><input name="home-check" type="checkbox"> Botón de Inicio</label>
+					<label><input name="zoom-check" type="checkbox"> Control de Zoom</label>
 				</div>					
 				<div class="checkbox">
-					<label><input name="zoom-check" type="checkbox"> Control de Zoom</label>
+					<label><input name="home-check" type="checkbox"> Botón de Inicio</label>
 				</div>					
 				<div class="checkbox">
 					<label><input name="scale-check" type="checkbox"> Indicador de Escala</label>
@@ -151,7 +154,7 @@
 				<div class="well">
 					<label for="embed-code">Código HTML: </label>
 					<code id="embed-code" class="form-control"></code>
-					<button type="button" class="btn btn-primary">Copiar</button>
+					<button id="copy-embed-code-button" type="button" class="btn btn-primary">Copiar</button>
 				</div>
 			</div>
 		</div>

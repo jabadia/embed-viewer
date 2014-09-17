@@ -9,10 +9,10 @@
 
 ## para el generador de urls
 
-- controlar el estado de los controles UI
+- controlar el estado de los controles UI									HECHO
+- cargar un webmap															HECHO
+- generar el código del iframe 												HECHO
+- previsualización, refresco												HECHO
+- copiar el código al portapapeles											HECHO
 - mejorar la maquetación (mejor en vertical con el mapa a la derecha?)
-- cargar un webmap
-- generar el código del iframe
-- previsualización, refresco
 - obtener la lista de capas y campos de cada capa para que el usuario elija de un desplegable
-- copiar el código al portapapeles

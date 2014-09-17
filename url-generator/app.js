@@ -2,6 +2,8 @@ $(function()
 {
 	"use strict";
 
+	var currentWebmapid = null;
+
 	console.log("inicializando");
 
 	/* helper functions */
@@ -15,15 +17,16 @@ $(function()
 		var mapSize = $('[name=map-size]:checked').val();
 		switch(mapSize)
 		{
-			case 'small':  uiState.width = 400; uiState.height = 300; break;
-			case 'medium': uiState.width = 500; uiState.height = 500; break;
-			case 'large':  uiState.width = 800; uiState.height = 600; break;
+			case 'small':  uiState.width = 300; uiState.height = 200; break;
+			case 'medium': uiState.width = 400; uiState.height = 300; break;
+			case 'large':  uiState.width = 600; uiState.height = 400; break;
 			case 'custom': 
 				uiState.width  = parseInt($('#map-custom-width').val()); if(isNaN(uiState.width)) uiState.width = 400;
 				uiState.height = parseInt($('#map-custom-height').val());if(isNaN(uiState.height)) uiState.height = 300;
 				break;
 		}
 
+		uiState.selectFeature = $('[name=select-feature]').prop('checked');
 		uiState.layerId   = $('[name=selected-layer').val();
 		uiState.fieldId   = $('[name=selected-field').val();
 		uiState.featureId = $('[name=selected-feature').val();
@@ -37,14 +40,20 @@ $(function()
 
 	function buildViewerUrl(uiState)
 	{
-		var viewerUrl = "../viewer/embedViewer.html?webmap=" + uiState.webmapid +
+		var currentLocation = window.location.protocol + "//" + window.location.host + window.location.pathname;
+		var viewerUrl = currentLocation + "../viewer/embedViewer.html?webmap=" + uiState.webmapid +
 			(uiState.home? "&home=true" : "") +
 			(uiState.zoom? "&zoom=true" : "") +
 			(uiState.scale? "&scale=true" : "") +
-			(uiState.showPopup? "&showPopup=true" : "") +
-			"&layerId=" + uiState.layerId +
-			"&fieldId=" + uiState.fieldId +
-			"&featureId=" + uiState.featureId;
+			(uiState.showPopup? "&showPopup=true" : "");
+
+		if( uiState.selectFeature )
+		{
+			viewerUrl +=	
+				"&layerId=" + uiState.layerId +
+				"&fieldId=" + uiState.fieldId +
+				"&featureId=" + uiState.featureId;
+		}
 
 		return viewerUrl;
 	}
@@ -67,19 +76,49 @@ $(function()
 
 	/* event handlers */
 
-	function loadWebmap()
+	function loadWebmap(webmapid)
 	{
+		if( webmapid == currentWebmapid)
+			return;
+
 		console.log("loadWebmap()");
+		var webmapurl = "http://www.arcgis.com/sharing/rest/content/items/" + webmapid;
+		$.ajax({
+			url:webmapurl, 
+			data: {f: "json"},
+			dataType: "json"
+		})
+		.done(function(data)
+		{
+			console.log(data);
+			$('#map-title').html(data.title);
+			$('#map-description').html(data.snippet);
+		});
 	}
 
-	function refreshIframe()
+	function cleanCode(code)
+	{
+		return code.replace(/[\t\n ]+/g," ").replace(/'/g,'"');
+	}
+
+	function refreshIframe(newIframeCode)
 	{
 		console.log("refreshIframe()");
+
+		var mapPreview = $("#map-preview");
+		var currentCode = mapPreview.html();
+		if( cleanCode(currentCode) != cleanCode(newIframeCode) )
+		{
+			mapPreview.html(newIframeCode);
+		}
 	}
 
 	function copyEmbedCode()
 	{
 		console.log("copyEmbedCode()");
+		var embedCode = $('#embed-code').text();
+		console.log(embedCode);
+		window.prompt("Para copiar el texto pulse Ctrl+C, Enter", embedCode);
 	}
 
 	function updateUI()
@@ -95,6 +134,9 @@ $(function()
 		var iframeCode = buildIframeCode(uiState);
 
 		$('#embed-code').text(iframeCode);
+
+		loadWebmap(uiState.webmapid);
+		refreshIframe(iframeCode);
 	}
 
 	/* init */
@@ -110,8 +152,20 @@ $(function()
 		/* initial values */
 		$('#map-size-medium').prop('checked',true);
 
+		$('#copy-embed-code-button').click(copyEmbedCode);
+
 		updateUI();
 	}
 
+	/* begin here */
+
+	if(window.location.search)
+	{
+		/* sample data */
+		$('#webmapid').val("bb7dd214060a4d97a1fead003ad1af37");
+		$('#selected-layer').val("Locales");
+		$('#selected-field').val("id_local");
+		$('#selected-feature').val("280048981");
+	}
 	initUI();
 });
