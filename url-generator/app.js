@@ -139,6 +139,15 @@ $(function()
 		refreshIframe(iframeCode);
 	}
 
+	function processIframeEvent(evt)
+	{
+		console.log(evt.originalEvent.data);
+		var clickLocation = JSON.parse(evt.originalEvent.data);
+
+		$('#click-x').html("<b>x:</b> " + clickLocation.x);
+		$('#click-y').html("<b>y:</b> " + clickLocation.y);
+	}
+
 	/* init */
 
 	function initUI()
@@ -153,6 +162,8 @@ $(function()
 		$('#map-size-medium').prop('checked',true);
 
 		$('#copy-embed-code-button').click(copyEmbedCode);
+
+		$(window).on('message', processIframeEvent);
 
 		updateUI();
 	}

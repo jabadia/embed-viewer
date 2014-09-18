@@ -133,7 +133,7 @@
         {
           console.log('received msg: ' + evt.data);
           var components = evt.data.split(':');
-          if( components.length < 3 && components[0] != 'change-id')
+          if( components.length < 3 || components[0] != 'change-id')
           {
             console.log("message from parent not recognized:", evt.data);
             return;
@@ -344,6 +344,24 @@
               selectFeature(layerId,fieldId,featureId,showPopup);
             }
 
+            if( layerId )
+            {
+              var layer = getLayerByTitle(response, layerId);
+
+              map.on('click', function(evt)
+              {
+                var msg = '{ "x":' + evt.mapPoint.x + ', "y":' + evt.mapPoint.y + ' }';
+                if( inIframe() )
+                {
+                  window.top.postMessage(msg,'*');
+                }
+                else
+                {
+                  alert("sending msg: " + msg);
+                }
+              });
+            }
+
             adjustPopupSize(map);
           }
           catch(error)
@@ -359,6 +377,14 @@
           console.log("CreateMap failed: ", dojo.toJson(error));
         });
 
+      }
+
+      function inIframe () {
+        try {
+          return window.self !== window.top;
+        } catch (e) {
+          return true;
+        }
       }
 
       function adjustPopupSize(map) {
