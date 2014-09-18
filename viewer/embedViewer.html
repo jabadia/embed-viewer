@@ -191,9 +191,19 @@
               map.setExtent(extent,true).then(function()
               {
                 map.infoWindow.setFeatures(selected);
-                if( showPopup )
-                {                      
-                  map.infoWindow.show(selected[0].geometry);
+                if( showPopup && layer.infoTemplate )
+                {
+                  selected[0].infoTemplate = layer.infoTemplate;
+//                  map.infoWindow.setTitle(selected[0].getTitle());
+                  map.infoWindow.setContent(selected[0].getContent());
+                  var geometry = selected[0].geometry;
+                  var position = (geometry.type == "point")?
+                    geometry : (
+                      (geometry.type == "polyline") ?
+                        geometry.getExtent().getCenter() :
+                        geometry.getCentroid()
+                    );
+                  map.infoWindow.show(position);
                 }                      
               });
             });
@@ -236,7 +246,14 @@
             dojo.forEach(layer.layerObject.layerInfos, function(layerInfo)
             {
               if(layerInfo.name == layerId)
-                layers.push({url: layer.url + "/" + layerInfo.id}); 
+              {              
+                var popupInfo = layer.layers.filter(function(l){ return l.id==layerInfo.id; })[0].popupInfo;
+                var infoTemplate = popupInfo? new esri.dijit.PopupTemplate(popupInfo) : null;
+                layers.push({
+                  url: layer.url + "/" + layerInfo.id, 
+                  infoTemplate: infoTemplate
+                }); 
+              }
             });
           }
         });
@@ -245,7 +262,14 @@
         dojo.forEach(response.itemInfo.itemData.operationalLayers, function(layerInfo)
         {
           if(layerInfo.title == layerId)
-            layers.push({url:layerInfo.url, objectIdField: layerInfo.layerObject.objectIdField });
+          {
+            var infoTemplate = layerInfo.disablePopup? null : new esri.dijit.PopupTemplate(layerInfo.popupInfo)
+            layers.push({
+              url:layerInfo.url, 
+              objectIdField: layerInfo.layerObject.objectIdField, 
+              infoTemplate:infoTemplate 
+            });
+          }
         });
 
         if( layers.length == 1)
