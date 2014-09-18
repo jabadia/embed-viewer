@@ -134,6 +134,8 @@ $(function()
 		var iframeCode = buildIframeCode(uiState);
 
 		$('#embed-code').text(iframeCode);
+		$('#map-preview').css('heigth', uiState.heigth + 40);
+		$('#map-preview').css('width', uiState.width + 40);
 
 		loadWebmap(uiState.webmapid);
 		refreshIframe(iframeCode);
@@ -144,8 +146,9 @@ $(function()
 		console.log(evt.originalEvent.data);
 		var clickLocation = JSON.parse(evt.originalEvent.data);
 
-		$('#click-x').html("<b>x:</b> " + clickLocation.x);
-		$('#click-y').html("<b>y:</b> " + clickLocation.y);
+		$('#click-x').html("<b>x:</b> " + Math.round(clickLocation.x * 100) / 100);
+		$('#click-y').html("<b>y:</b> " + Math.round(clickLocation.y * 100) / 100);
+		$('#click-srs').html("<b>sr:</b>" + clickLocation.sr.wkid )
 	}
 
 	/* init */

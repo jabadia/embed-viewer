@@ -4,7 +4,7 @@
 - api para que el padre pueda seleccionar un elemento distinto		HECHO
 - generar los tests por código										HECHO
 - que pasa si devuelve mas de un elemento?
-- url de vuelta? avisar al frame padre?
+- url de vuelta? avisar al frame padre?								HECHO
 - identidad!!!
 
 ## para el generador de urls

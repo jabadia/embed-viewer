@@ -32,6 +32,17 @@
 			white-space: pre;
 			height: auto !important;
 		}
+		#webmapid {
+			width: 280px;
+			text-align: center;		
+			display: inline-block;	
+		}
+		.row {
+			margin-bottom: 20px;
+		}
+		h4 {
+			margin-top: 20px;
+		}
 	</style>
 </head>
 <body>
@@ -63,31 +74,13 @@
 			<div class="col-sm-12">
 				<h3>Mapa: <span id="map-title">[ninguno]</span></h3>
 				<p id="map-description">-</p><br>
-				<div class="form form-group">
-					<label for="webmapid" class="control-label col-sm-2">Webmap ID:</label>
-					<div class="col-sm-4">
-						<input type="text" name="webmapid" id="webmapid" placeholder="webmap id" class="form-control" value="bb7dd214060a4d97a1fead003ad1af37">
-					</div>
-				</div>
+				<label for="webmapid" class="control-label">Webmap ID:</label>
+				<input type="text" name="webmapid" id="webmapid" placeholder="webmap id" class="form-control" value="bb7dd214060a4d97a1fead003ad1af37">
 			</div>
 		</div>
 
 		<div class="row">
-			<div class="col-sm-12">
-				<h4>Previsualización</h4>
-				<div id="map-preview" class="well">
-					<iframe id="map-frame"
-						width="600" height="300" 
-						frameborder="0" scrolling="no" 
-						marginheight="0" marginwidth="0" 
-						src=""></iframe>
-				</div>
-				<div>Último click: <span id="click-x">-</span>, <span id="click-y">-</span></div>
-			</div>
-		</div>
-
-		<div class="row">			
-			<div class="col-sm-3">
+			<div class="col-sm-4">
 				<h4>Tamaño (px)</h4>
 				<div class="radio">
 				<input type="radio" name="map-size" id="map-size-small" value="small"><label for="map-size-small"> Pequeño (300x200)</label>
@@ -106,13 +99,12 @@
 					x
 					<input type="text" name="map-custom-height" id="map-custom-height" placeholder="alto">
 				</div>
-			</div>
-			<div class="col-sm-3">
+
 				<h4>Selección Inicial</h4>
 				<div class="form-horizontal">
 					<div class="checkbox">
 						<label><input name="select-feature" type="checkbox"> Seleccionar una Entidad</label>
-					</div>					
+					</div>
 					<div class="form-group">
 						<label for="selected-layer" class="control-label col-sm-2">Capa</label>
 						<div class="col-sm-8">
@@ -132,8 +124,7 @@
 						</div>
 					</div>
 				</div>
-			</div>
-			<div class="col-sm-3">
+
 				<h4>Opciones</h4>
 				<div class="checkbox">
 					<label><input name="show-popup-check" type="checkbox"> Abrir pop-up automáticamente</label>
@@ -148,6 +139,21 @@
 					<label><input name="scale-check" type="checkbox"> Indicador de Escala</label>
 				</div>
 			</div>
+
+			<div class="col-sm-8">
+				<h4>Previsualización</h4>
+				<div id="map-preview" class="well">
+					<iframe id="map-frame"
+						width="600" height="300" 
+						frameborder="0" scrolling="no" 
+						marginheight="0" marginwidth="0" 
+						src=""></iframe>
+				</div>
+				<div>Último click: <span id="click-x">-</span>, <span id="click-y">-</span> <span id="click-srs">-</span></div>
+			</div>
+		</div>
+
+		<div class="row">			
 		</div>
 
 		<div class="row">

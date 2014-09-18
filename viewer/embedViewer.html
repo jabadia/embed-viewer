@@ -350,7 +350,11 @@
 
               map.on('click', function(evt)
               {
-                var msg = '{ "x":' + evt.mapPoint.x + ', "y":' + evt.mapPoint.y + ' }';
+                var msg = JSON.stringify({ 
+                  x: evt.mapPoint.x,
+                  y: evt.mapPoint.y,
+                  sr: map.spatialReference
+                });
                 if( inIframe() )
                 {
                   window.top.postMessage(msg,'*');
