@@ -38,10 +38,10 @@
 			display: inline-block;	
 		}
 		.row {
-			margin-bottom: 20px;
+			margin-bottom: 10px;
 		}
 		h4 {
-			margin-top: 20px;
+			margin-top: 10px;
 		}
 	</style>
 </head>
@@ -106,15 +106,17 @@
 						<label><input name="select-feature" type="checkbox"> Seleccionar una Entidad</label>
 					</div>
 					<div class="form-group">
-						<label for="selected-layer" class="control-label col-sm-2">Capa</label>
+						<label for="selected-layer" class="control-label col-sm-2">Capa</label>						
 						<div class="col-sm-8">
-							<input type="text" class="form-control" name="selected-layer" id="selected-layer" placeholder="layerId" value="{layerId}">
+						<select name="selected-layer" id="selected-layer" class="form-control">	
+						</select>
 						</div>
 					</div>
 					<div class="form-group">
 						<label for="selected-field" class="control-label col-sm-2">Campo</label>
 						<div class="col-sm-8">
-							<input type="text" class="form-control" name="selected-field" id="selected-field" placeholder="fieldId" value="{fieldId}">
+							<select name="selected-field" id="selected-field" class="form-control">
+							</select>
 						</div>
 					</div>
 					<div class="form-group">
@@ -170,8 +172,12 @@
 
 	<!-- 
 	<script src="//code.jquery.com/jquery-1.10.1.min.js"></script>
+	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js" >
 	-->
 	<script src="jquery-1.10.1.min.js"></script>
+	<!-- 
+	<script src="bootstrap.min.js"></script>
+	-->
 	<script src="app.js"></script>
 </body>
 </html>

@@ -74,25 +74,125 @@ $(function()
 		return iframeCode;
 	}
 
-	/* event handlers */
+	function getLayerNames(itemData)
+	{
+		console.log(itemData);
+
+        var promises = itemData.operationalLayers.map(function(layer)
+        {
+          if(layer.layerType == "ArcGISMapServiceLayer")
+          {
+          	var deferred = new $.Deferred();
+
+          	$.ajax({
+          		url: layer.url,
+          		data: { f:"json"},
+          		dataType: "json"
+          	})
+          	.done(function(serviceData)
+          	{
+	          	var layers = serviceData.layers.map(function(layerInfo)
+	            {
+	            	return({title:layerInfo.name, type:"ArcGISMapServiceLayer", url:layer.url + '/' + layerInfo.id });
+	            });
+	            deferred.resolve(layers);
+          	});
+
+          	return deferred;
+          }
+          else
+          {
+			return({title:layer.title, type:layer.layerType, url:layer.url});
+          }
+        });
+
+		var deferred = new $.Deferred();        
+        $.when.apply($,promises).done(function()
+        {
+        	var layers = [].concat.apply([],arguments);	// flatten nested arrays
+        	layers = layers.filter(function(l){ return l.type != "ArcGISTiledMapServiceLayer"});
+        	deferred.resolve(layers);
+        });
+        return deferred;
+	}
+
+	function updateLayerNames(itemData)
+	{
+		getLayerNames(itemData).done(function(layers)
+		{
+			var options = layers.map(function(layer)
+			{								
+				return $('<option>')
+					.val(layer.title)
+					.attr('data-layer-url', layer.url)
+					.text(layer.title)
+			});
+			$('#selected-layer').html(options);
+			updateFieldNames();
+		});
+	}
+
+	function getLayerFields(layerUrl)
+	{
+		var deferred = new $.Deferred();
+
+		$.ajax({
+      		url: layerUrl,
+      		data: { f:"json"},
+      		dataType: "json"
+          	})
+        .done(function(layerData)
+        {
+        	deferred.resolve(layerData.fields);
+        });
+        return deferred;
+	}
+
+	function updateFieldNames()
+	{
+		var selectedLayerUrl = $('#selected-layer option:selected').attr('data-layer-url');
+
+		getLayerFields(selectedLayerUrl).done(function(fields)
+		{
+        	var options = fields.map(function(field)
+        	{
+        		return $('<option>')
+        			.val(field.name)
+        			.text(field.alias);
+        	});
+        	$('#selected-field').html(options);
+		});
+	}
 
 	function loadWebmap(webmapid)
 	{
 		if( webmapid == currentWebmapid)
 			return;
 
+		currentWebmapid = webmapid;
+
 		console.log("loadWebmap()");
-		var webmapurl = "http://www.arcgis.com/sharing/rest/content/items/" + webmapid;
+		var webmapItemUrl = "http://www.arcgis.com/sharing/rest/content/items/" + webmapid;
 		$.ajax({
-			url:webmapurl, 
+			url:webmapItemUrl, 
 			data: {f: "json"},
 			dataType: "json"
 		})
-		.done(function(data)
+		.done(function(item)
 		{
-			console.log(data);
-			$('#map-title').html(data.title);
-			$('#map-description').html(data.snippet);
+			$('#map-title').html(item.title);
+			$('#map-description').html(item.snippet);
+		});
+
+		var webmapItemDataUrl = webmapItemUrl + "/data";
+		$.ajax({
+			url:webmapItemDataUrl,
+			data: {f: "json"},
+			dataType: "json"
+		})
+		.done(function(itemData)
+		{
+			updateLayerNames(itemData);
 		});
 	}
 
@@ -112,6 +212,8 @@ $(function()
 			mapPreview.html(newIframeCode);
 		}
 	}
+
+	/* event handlers */	
 
 	function copyEmbedCode()
 	{
@@ -160,6 +262,8 @@ $(function()
 		$('[type=checkbox]').change(updateUI);
 		$('[type=radio]').change(updateUI);
 		$('[type=text]').change(updateUI);
+		$('select').change(updateUI);
+		$('#selected-layer').change(updateFieldNames);
 
 		/* initial values */
 		$('#map-size-medium').prop('checked',true);
@@ -176,20 +280,24 @@ $(function()
 	if(window.location.search == "?colera")
 	{
 		$('#webmapid').val("6e5721d80f3340d08e7ec24a798e6639");
+		/*
 		$('#selected-layer').val("Fuentes");
 		$('#selected-field').val("id");
 		$('#selected-feature').val("1");
 		$('[name=select-feature]').prop('checked',true);
+		*/
 	}
 	else if(window.location.search)
 	{
 		/* sample data */
 		$('#webmapid').val("bb7dd214060a4d97a1fead003ad1af37");
+		/*
 		$('#selected-layer').val("Locales");
 		$('#selected-field').val("id_local");
 		$('#selected-feature').val("280048981");
 		$('#select-feature').prop('checked',true);
 		$('[name=select-feature]').prop('checked',true);
+		*/
 	}
 	initUI();
 });
