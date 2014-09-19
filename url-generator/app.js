@@ -118,6 +118,7 @@ $(function()
 
 	function updateLayerNames(itemData)
 	{
+		$('#selected-layer').empty();
 		getLayerNames(itemData).done(function(layers)
 		{
 			var options = layers.map(function(layer)
@@ -150,6 +151,8 @@ $(function()
 
 	function updateFieldNames()
 	{
+		$('#selected-field').empty();
+		
 		var selectedLayerUrl = $('#selected-layer option:selected').attr('data-layer-url');
 
 		getLayerFields(selectedLayerUrl).done(function(fields)
