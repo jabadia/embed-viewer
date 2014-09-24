@@ -186,8 +186,8 @@
               var extent = esri.graphicsExtent(selected);
               console.log("EXTENT:",extent, extent.getHeight(), extent.getWidth());
               extent.expand(1.2);
-              if( extent.getHeight() == 0) { extent.ymin -= 250; extent.ymax += 250; }
-              if( extent.getWidth()  == 0) { extent.xmin -= 250; extent.xmax += 250; }
+              if( extent.getHeight() == 0) { extent.ymin -= 50; extent.ymax += 50; }
+              if( extent.getWidth()  == 0) { extent.xmin -= 50; extent.xmax += 50; }
 
               /* ajustar para que quepa el pop-up */
               if( showPopup )

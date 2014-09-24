@@ -223,6 +223,7 @@ $(function()
 		console.log("copyEmbedCode()");
 		var embedCode = $('#embed-code').text();
 		console.log(embedCode);
+		embedCode = embedCode.replace(/&/g,'&amp;');
 		window.prompt("Para copiar el texto pulse Ctrl+C, Enter", embedCode);
 	}
 
